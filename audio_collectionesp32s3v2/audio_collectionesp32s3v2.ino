@@ -13,11 +13,9 @@
 #define BUTTON_PIN    12
 
 // ==================== Audio settings ====================
-#define n
-nnnn   16000
-#define RECORD_SEC    2     // Fixed to 2 seconds
-#define BUFFER_SIZE   (n
-nnnn * RECORD_SEC)
+#define SAMPLE_RATE   16000
+#define RECORD_SEC    2
+#define BUFFER_SIZE   (SAMPLE_RATE * RECORD_SEC)
 
 int16_t *record_buffer = nullptr;
 size_t record_samples = 0;
@@ -80,8 +78,7 @@ void setup() {
 
   // ---- Init microphone (16-bit mono) ----
   i2sMic.setPins(I2S_MIC_BCLK, I2S_MIC_WS, -1, I2S_MIC_DATA);
-  if (!i2sMic.begin(I2S_MODE_STD, n
-  nnnn, I2S_DATA_BIT_WIDTH_16BIT,
+  if (!i2sMic.begin(I2S_MODE_STD, SAMPLE_RATE, I2S_DATA_BIT_WIDTH_16BIT,
                     I2S_SLOT_MODE_MONO, I2S_STD_SLOT_LEFT)) {
     Serial.println("Mic init failed!");
     while (1);
@@ -89,8 +86,7 @@ void setup() {
 
   // ---- Init speaker (32-bit stereo) ----
   i2sSpk.setPins(I2S_SPK_BCLK, I2S_SPK_LRC, I2S_SPK_DIN, -1);
-  if (!i2sSpk.begin(I2S_MODE_STD, n
-  nnnn, I2S_DATA_BIT_WIDTH_32BIT,
+  if (!i2sSpk.begin(I2S_MODE_STD, SAMPLE_RATE, I2S_DATA_BIT_WIDTH_32BIT,
                     I2S_SLOT_MODE_STEREO)) {
     Serial.println("Speaker init failed!");
     while (1);
@@ -252,8 +248,7 @@ void saveWav(String fullPath) {
   uint32_t fileSize = dataSize + 36;
   uint16_t audioFormat = 1;
   uint16_t numChannels = 1;
-  uint32_t byteRate = n
-  nnnn * numChannels * 2;
+  uint32_t byteRate = SAMPLE_RATE * numChannels * 2;
   uint16_t blockAlign = numChannels * 2;
   uint16_t bitsPerSample = 16;
 
@@ -268,8 +263,7 @@ void saveWav(String fullPath) {
   f.write((const uint8_t*)"WAVE", 4);
   f.write((const uint8_t*)"fmt ", 4); writeLE(16, 4);
   writeLE(audioFormat, 2); writeLE(numChannels, 2);
-  writeLE(n
-  nnnn, 4); writeLE(byteRate, 4);
+  writeLE(SAMPLE_RATE, 4); writeLE(byteRate, 4);
   writeLE(blockAlign, 2); writeLE(bitsPerSample, 2);
   f.write((const uint8_t*)"data", 4); writeLE(dataSize, 4);
 
